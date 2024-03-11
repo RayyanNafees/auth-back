@@ -9,6 +9,8 @@ const port = process.env.PORT;
 
 //middleware provided by Express to parse incoming JSON requests.
 app.use(express.json()); 
+// app.use(express.urlencoded())
+
 
 await mongoose.connect(process.env.MONGODB_URL).then(() => {
   console.log("MongoDB is connected!");

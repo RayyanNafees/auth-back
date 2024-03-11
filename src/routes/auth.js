@@ -1,23 +1,23 @@
 import { Router } from 'express'
 import { User } from '../models/User.js'
 import jwt from 'jsonwebtoken'
-import { genSalt, hash } from 'bcryptjs'
+import bcrypt from 'bcryptjs'
 const router = Router()
 
-const hashedPassword = async (password) => {
-  const salt = await genSalt(10)
+const hashedPassword = async (pass) => {
+  const salt = await bcrypt.genSalt(10)
 
   // const hashedPassword = await
-  const hashed = await hash(pass, salt)
+  const hashed = await bcrypt.hash(pass, salt)
   return hashed
 }
 
 // Signup route
 router.post('/signup', async (req, res) => {
+  console.log('Authed signed up')
   try {
     const { username, password } = req.body
-    const crypto = new Crypto()
-    CryptoKey()
+    
     const user = new User({
       username,
       password: await hashedPassword(password),
@@ -25,10 +25,14 @@ router.post('/signup', async (req, res) => {
     await user.save()
     res.status(201).json({ message: 'New user registered successfully' })
   } catch (error) {
+    console.error(error)
     res.status(500).json({ message: 'Internal server error' })
   }
 })
-
+const log = (obj, ...msg) => {
+  console.log(...msg,(obj))
+  return obj
+}
 // Login route
 router.post('/login', async (req, res) => {
   const { username, password } = req.body
@@ -38,7 +42,7 @@ router.post('/login', async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: 'Invalid username or password' })
     }
-    if (user.password !== (await hashedPassword(password))) {
+    if (log(user.password, 'user.pass') !== log(await hashedPassword(password), 'bcrypt.pass')) {
       return res.status(401).json({ message: 'Invalid username or password' })
     }
     // Generate JWT token
